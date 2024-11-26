@@ -35,7 +35,7 @@ def test_agent_feed():
     from Food import Food
     from Enviroment import Enviroment
     environment = Enviroment()
-    agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=environment)
+    agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=environment, fooodlevel=0)
     food = Food(0, 0, 0, 0, 0, 10, env=environment)
     agent.feed(food.foodlevel)
     assert agent.foodlevel == 10
@@ -63,3 +63,12 @@ def test_validMove():
     assert not agent.validMove(0, -1)
     assert not agent.validMove(101, 0)
     assert not agent.validMove(0, 101)
+
+def test_decreaseFood():
+    from Agent import Agent
+    from Enviroment import Enviroment
+    env = Enviroment()
+    agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=env, fooodlevel=0)
+    agent.decreaseFood()
+    assert agent.foodlevel == -1
+    assert len(env.eventManager) == 1

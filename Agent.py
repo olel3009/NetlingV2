@@ -5,7 +5,7 @@ from Event import Event, Events
 import math
 
 class Agent(Object):
-    def __init__(self, x, y, r, width, height, fooodlevel = 0, maxfoodlevel = 100, noBrain = False, env = None):
+    def __init__(self, x, y, r, width, height, fooodlevel = 100, maxfoodlevel = 100, noBrain = False, env = None):
         if env is None and noBrain:
             env = "test"
         super().__init__(x, y, r, width, height, env)
@@ -52,7 +52,15 @@ class Agent(Object):
             return
         r = self.brain.think([self.x, self.y])
         self.moveRelativeByAngle(r[0], self.speed * r[1])
+        self.decreaseFood(r[0])
         pass
+
+    def decreaseFood(self, decreaseFaktor=1):
+        self.foodlevel -= decreaseFaktor
+        if self.foodlevel <= 0:
+            self.logger.debug(f"{self.type} died")
+            self.env.eventManager.append(Event(Events.DEATH, (self, self)))
+        self.logger.debug(f"{self.type} food level is now {self.foodlevel}")
 
     def onCollission(self, obj, eventManager):
         if isinstance(obj, Food):

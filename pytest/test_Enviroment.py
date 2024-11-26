@@ -69,13 +69,13 @@ def test_Eat():
     from Enviroment import Enviroment
     from Food import Food
     env = Enviroment()
-    agent = Agent(10, 10, 0, 10, 10, noBrain=True, env=env)
+    agent = Agent(10, 10, 0, 10, 10, noBrain=True, env=env, fooodlevel=10)
     food = Food(10, 10, 0, 10, 10, 10, env=env)
     env.addObjects(agent)
     env.addObjects(food)
     env.update()
     assert len(env.objects) == 1
-    assert agent.foodlevel == 10
+    assert agent.foodlevel == 20
 
 def test_collectAll():
     from Object import Object
