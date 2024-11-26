@@ -1,9 +1,16 @@
 import json
 import asyncio
 import os
+import random
 import sys
 import logging
+import uvicorn
 
+from Object import Object
+from Food import Food
+from Agent import Agent
+
+from Enviroment import Enviroment
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from typing import List
 
@@ -32,14 +39,19 @@ class ConnectionManager:
             await connection.send_text(data)
 
 manager = ConnectionManager()
-environment = Enviroment()
+environment = Enviroment(1000, 1000)
+
+environment.spawnObjects(Food, 100)
+environment.spawnObjects(Agent, 10)
+app = FastAPI()
 
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
     await manager.connect(websocket)
     try:
         while True:
-            agents_data = environment.moveAll()
+            environment.update()
+            agents_data = environment.collectAll()
             await manager.broadcast(agents_data)
             await asyncio.sleep(1 / 60)  # 30 updates per second
     except WebSocketDisconnect:
@@ -47,3 +59,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
     except Exception as e:
         print(f"Error: {e}")
         manager.disconnect(websocket)
+
+#start the server
+if __name__ == "__main__":
+    uvicorn.run(host="127.0.0.1", port=8000, app=app)

@@ -11,7 +11,6 @@ class Quadtree:
     def insert(self, point):
         if not self.contains(point):
             return
-
         if not(self.divided) and len(self.points) < self.capacity:
             self.points.append(point)
         else:
@@ -59,8 +58,28 @@ class Quadtree:
             found += self.southwest.query(range, level + 1)
         return found
 
+    def remove(self, point):
+        if not self.contains(point):
+            return
+        if point in self.points:
+            self.points.remove(point)
+        elif self.divided:
+            self.northeast.remove(point)
+            self.northwest.remove(point)
+            self.southeast.remove(point)
+            self.southwest.remove(point)
+        if len(self.points) == 0:
+            self.divided = False
 
-class range:
+    def clear(self):
+        self.points = []
+        self.divided = False
+        self.northeast = None
+        self.northwest = None
+        self.southeast = None
+        self.southwest = None
+
+class rect:
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
