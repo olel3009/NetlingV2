@@ -15,6 +15,7 @@ class Agent(Object):
         self.foodlevel = fooodlevel
         self.maxfoodlevel = maxfoodlevel
         self.noBrain = noBrain
+        self.identifier = 0.9
         if not noBrain:
             self.brain = Brain()
 
@@ -51,7 +52,7 @@ class Agent(Object):
     def update(self):
         if self.noBrain:
             return
-        r = self.brain.think([self.x, self.y])
+        r = self.brain.think([self.x, self.y], self.getVission())
         self.moveRelativeByAngle(r[0], self.speed * r[1])
         self.decreaseFood(r[0])
         pass
@@ -104,7 +105,8 @@ class Agent(Object):
 
         def _isInVissionDistance(obj):
             distance = math.sqrt((obj.x - self.x) ** 2 + (obj.y - self.y) ** 2)
-            return (distance, obj) if distance <= 30 else False
+            angle_to_obj = math.atan2(obj.y - self.y, obj.x - self.x)
+            return (distance, angle_to_obj, obj) if distance <= 30 else False
 
         vission = self.env.quadtree.query(self.getVisionRect(), 0)
         filtered_vission = [obj for obj in vission if _isInVissionAngle(obj[1])]

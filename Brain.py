@@ -11,5 +11,17 @@ class Brain:
         self.genome.configure_new(NEATConfig.genome_config)
         self.net = neat.nn.FeedForwardNetwork.create(self.genome, NEATConfig)
 
-    def think(self, inputs):
-        return self.net.activate(inputs)
+    def think(self, inputs, lens=None):
+        inputs1 = []
+        if lens:
+            for obj in lens:
+                inputs1 += obj.objToVector(obj)
+        inputs1 += [0] * (12 - len(inputs1))
+        return self.net.activate(inputs + inputs1)
+
+    def objToVector(self, obj):
+        distance = obj[0]
+        angle = obj[1]
+        object = obj[2]
+        type = object.identifier
+        return [distance, angle, type]
