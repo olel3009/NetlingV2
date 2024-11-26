@@ -72,3 +72,70 @@ def test_decreaseFood():
     agent.decreaseFood()
     assert agent.foodlevel == -1
     assert len(env.eventManager) == 1
+
+def test_vision_rect():
+    from Agent import Agent
+    from Enviroment import Enviroment
+    env = Enviroment()
+    agent = Agent(50, 50, 0, 10, 10, noBrain=True, env=env)
+    env.addObjects(agent)
+    v = agent.getVission()
+    assert v == []
+    env.objects[0].r = 0
+
+    agent1 = Agent(80, 55, 0, 0, 0, noBrain=True, env=env)
+    env.addObjects(agent1)
+    v = env.objects[0].getVisionRect()
+    assert len(env.quadtree.query(v)) == 1
+
+
+def test_filtered_vision():
+    from Agent import Agent
+    from Enviroment import Enviroment
+
+    # Initialisiere die Umgebung
+    env = Enviroment()
+
+    # Erstelle den Hauptagenten mit Sichtfeld
+    agent = Agent(50, 50, 0, 10, 10, noBrain=True, env=env)
+    env.addObjects(agent)
+
+    # Überprüfen, ob die Sicht zu Beginn leer ist
+    v = agent.getVission()
+    assert v == []
+
+    # Teste für 8 verschiedene Winkel
+    angles = [0, 45, 90, 135, 180, 225, 270, 315]
+    results = []
+
+    for angle in angles:
+        # Setze die Rotation des Hauptagenten
+        env.objects[0].r = angle
+
+        # Platziere den zweiten Agenten passend zur Rotation
+        if angle == 0:
+            agent1 = Agent(80, 55, 0, 0, 0, noBrain=True, env=env)  # Rechts
+        elif angle == 45:
+            agent1 = Agent(80, 80, 0, 0, 0, noBrain=True, env=env)  # Rechts oben
+        elif angle == 90:
+            agent1 = Agent(50, 80, 0, 0, 0, noBrain=True, env=env)  # Oben
+        elif angle == 135:
+            agent1 = Agent(20, 80, 0, 0, 0, noBrain=True, env=env)  # Links oben
+        elif angle == 180:
+            agent1 = Agent(20, 55, 0, 0, 0, noBrain=True, env=env)  # Links
+        elif angle == 225:
+            agent1 = Agent(20, 20, 0, 0, 0, noBrain=True, env=env)  # Links unten
+        elif angle == 270:
+            agent1 = Agent(50, 20, 0, 0, 0, noBrain=True, env=env)  # Unten
+        elif angle == 315:
+            agent1 = Agent(80, 20, 0, 0, 0, noBrain=True, env=env)  # Rechts unten
+
+        # Füge den zweiten Agenten hinzu und prüfe die Sicht
+        env.addObjects(agent1)
+        v = env.objects[0].getVission()
+
+        # Überprüfe, ob der Agent korrekt erkannt wurde
+        results.append((angle, len(v) == 1))
+
+        # Entferne den zweiten Agenten für den nächsten Test
+        env.objects.pop()
