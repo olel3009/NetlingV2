@@ -5,7 +5,7 @@ class Food(Object):
         self.type = "Food"
         self.foodlevel = foodlevel
         self.logger.debug(f"{self.type} created at ({self.x}, {self.y})")
-
+        self.identifier = 0.8
     def update(self):
         pass
 

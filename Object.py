@@ -1,6 +1,6 @@
 import logging
 
-from Settings.IDManager import IDManager
+from IDManager import IDManager
 
 class Object:
     def __init__(self, x, y, r, width, height, env):
@@ -16,6 +16,7 @@ class Object:
         self.height = height
         self.id = IDManager.generateID()
         self.type = self.__class__.__name__
+        self.identifier = 1
         self.logger.debug(f"{self.type} created at ({self.x}, {self.y})")
 
     def update(self):
@@ -28,3 +29,6 @@ class Object:
 
     def collect(self):
         return {"x": self.x, "y": self.y, "r": self.r, "width": self.width, "height": self.height, "id": self.id, "type": self.type}
+
+    def collectInDetail(self):
+        return self.collect()

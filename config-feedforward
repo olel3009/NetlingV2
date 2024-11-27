@@ -1,13 +1,13 @@
 [NEAT]
 fitness_criterion = max
 fitness_threshold = 3.9
-pop_size = 1000
+pop_size = 1500
 reset_on_extinction = False
 
 [DefaultGenome]
-activation_default = tanh
+activation_default = sigmoid
 activation_mutate_rate = 0.1
-activation_options = tanh relu
+activation_options = sigmoid
 aggregation_default = sum
 aggregation_mutate_rate = 0.0
 aggregation_options = sum product max
@@ -15,45 +15,45 @@ bias_init_mean = 0.0
 bias_init_stdev = 2.0
 bias_max_value = 30.0
 bias_min_value = -30.0
-bias_mutate_power = 1.0
+bias_mutate_power = 2.0
 bias_mutate_rate = 0.7
 bias_replace_rate = 0.1
 response_init_mean = 1.0
 response_init_stdev = 0.1
 response_max_value = 30.0
 response_min_value = -30.0
-response_mutate_power = 0.5
+response_mutate_power = 1.0
 response_mutate_rate = 0.1
 response_replace_rate = 0.1
 weight_init_mean = 0.0
 weight_init_stdev = 2.0
 weight_max_value = 30.0
 weight_min_value = -30.0
-weight_mutate_power = 1.0
+weight_mutate_power = 2.0
 weight_mutate_rate = 0.8
 weight_replace_rate = 0.1
 enabled_default = True
 enabled_mutate_rate = 0.05
-conn_add_prob = 0.8
-conn_delete_prob = 0.2
-node_add_prob = 0.5
-node_delete_prob = 0.2
+conn_add_prob = 0.9
+conn_delete_prob = 0.1
+node_add_prob = 0.6
+node_delete_prob = 0.1
 feed_forward = True
+num_hidden = 32
+num_inputs = 14
+num_outputs = 3
 initial_connection = full_nodirect
-num_hidden = 10
-num_inputs = 2
-num_outputs = 2
-compatibility_disjoint_coefficient = 1.0
-compatibility_weight_coefficient = 0.5
+compatibility_disjoint_coefficient = 0.8
+compatibility_weight_coefficient = 1.0
 
 [DefaultSpeciesSet]
-compatibility_threshold = 3.0
+compatibility_threshold = 2.5
 
 [DefaultStagnation]
 species_fitness_func = max
-max_stagnation = 20
+max_stagnation = 15
 species_elitism = 2
 
 [DefaultReproduction]
-elitism = 2
-survival_threshold = 0.2
+elitism = 1
+survival_threshold = 0.1

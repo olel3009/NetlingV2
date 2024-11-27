@@ -1,9 +1,20 @@
 import logging
 from Quadtree import Quadtree, rect
-from Event import Event, Events, CollissionEvent
+from Event import Events, CollissionEvent
 import random
+from Agent import Agent
+from Brain import Brain
+from Food import Food
+from IDManager import GenomeManagerInstance
+import neat
+config_path = "/config-feedforward"
+NEATConfig = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                         "config-feedforward")
+
 class Enviroment():
-    def __init__(self, width = 100, height = 100, agentsCount= 0, foodCount = 0):
+    next_node_id = 0
+
+    def __init__(self, width = 100, height = 100, agentsCount= 0, foodCount = 0, minCountAgent=-1, minCountFood=-1):
         self.objects = []
         self.logger = logging.getLogger(__name__)
 
@@ -16,6 +27,12 @@ class Enviroment():
         self.eventManager = []
         self.logger.debug("EventManager created")
         self.logger.debug("Enviroment created")
+
+        self.minCountAgent = minCountAgent
+        self.minCountFood = minCountFood
+
+        self.spawnObjects(Agent, agentsCount, rad=rect(0, 0, self.width, self.height), fooodlevel=100, maxfoodlevel=100)
+        self.spawnObjects(Food, foodCount, rad=rect(0, 0, self.width, self.height), foodlevel=10)
 
     def addObjects(self, obj):
         self.objects.append(obj)
@@ -49,6 +66,17 @@ class Enviroment():
             self.quadtree.insert(obj)
         self.logger.debug("Quadtree updated")
 
+
+        #TODO: Replace this with a better solution
+        if self.minCountAgent != -1 and len([obj for obj in self.objects if isinstance(obj, Agent)]) < self.minCountAgent:
+            agent_params = (250, 250, 0, 10, 10, 50, 100)
+            agents = [obj for obj in self.objects if isinstance(obj, Agent)]
+            parent1 = max(agents, key=lambda agent: agent.foodlevel)
+            parent2 = max([agent for agent in agents if agent != parent1], key=lambda agent: agent.foodlevel)
+            self.addObjects(self.create_offspring_from_parents(parent1, parent2, NEATConfig, self, agent_params))
+        if self.minCountFood != -1 and len([obj for obj in self.objects if isinstance(obj, Food)]) < self.minCountFood:
+            self.spawnObjects(Food, 1, rad=rect(0, 0, self.width, self.height), foodlevel=10)
+
     def collectAll(self):
         return [obj.collect() for obj in self.objects]
 
@@ -58,7 +86,10 @@ class Enviroment():
                 event.data[0].onCollission(event.data[1], self.eventManager)
             if event.event_type == Events.DEATH:
                 event.data[0].onDeath(event.data[1], self.eventManager)
-                self.removeObjects(event.data[0])
+                try:
+                    self.removeObjects(event.data[0])
+                except:
+                    pass
         self.eventManager = []
 
     def _collissionEvent(self):
@@ -78,3 +109,56 @@ class Enviroment():
                     return other
         return None
 
+    def create_offspring_from_parents(self, parent1, parent2, config, env, agent_params):
+        """
+        Erzeugt einen neuen Agent durch Crossover und Mutation von zwei Eltern.
+
+        Args:
+            parent1 (Agent): Der erste Eltern-Agent.
+            parent2 (Agent): Der zweite Eltern-Agent.
+            config (neat.Config): Die NEAT-Konfiguration.
+            env (Enviroment): Die Umgebung, in der die Agents agieren.
+            agent_params (tuple): Standardparameter für Agents (x, y, r, width, height, foodlevel, maxfoodlevel).
+
+        Returns:
+            Agent: Der neue Agent.
+        """
+        x, y, r, width, height, foodlevel, maxfoodlevel = agent_params
+        x = random.randint(0, self.width)
+        y = random.randint(0, self.height)
+
+        # Debug-Ausgabe für die Eltern
+        print(
+            f"Erzeuge Nachkomme aus Eltern:\n- Parent1 Fitness: {parent1.foodlevel}\n- Parent2 Fitness: {parent2.foodlevel}")
+        if parent1.foodlevel < 50 or parent2.foodlevel < 50:
+            return Agent(x, y, r, width, height, foodlevel, maxfoodlevel, env=env)
+        parent1.brain.genome.fitness = parent1.foodlevel
+        parent2.brain.genome.fitness = parent2.foodlevel
+
+        child_genome = GenomeManagerInstance.NEATConfig.genome_type(GenomeManagerInstance.generateID())
+        child_genome.configure_crossover(parent1.brain.genome, parent2.brain.genome,
+                            GenomeManagerInstance.NEATConfig.genome_config)
+        child_genome.mutate(GenomeManagerInstance.NEATConfig.genome_config)
+
+
+        # 5. Mutiere das neue Genom
+        try:
+            child_genome.mutate(GenomeManagerInstance.NEATConfig.genome_config)
+        except AssertionError as e:
+            print(f"Mutation fehlgeschlagen: {e}. Initialisiere Genom neu.")
+            child_genome.configure_new(GenomeManagerInstance.NEATConfig.genome_config)
+
+        # 6. Erstelle ein neues Gehirn für den Nachkommen
+        brain = Brain()
+        brain.genome = child_genome
+        brain.net = neat.nn.FeedForwardNetwork.create(child_genome, GenomeManagerInstance.NEATConfig)
+
+        # 7. Erstelle den neuen Agenten
+
+        new_agent = Agent(x, y, r, width, height, foodlevel, maxfoodlevel, noBrain=False, env=env)
+        new_agent.brain = brain
+
+        # Debug-Ausgabe für den Nachkommen
+        print(f"Neuer Agent erstellt mit ID: {child_genome.key} und Gehirn-Netzwerk.")
+
+        return new_agent

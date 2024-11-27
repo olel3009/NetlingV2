@@ -53,8 +53,9 @@ class Agent(Object):
         if self.noBrain:
             return
         r = self.brain.think([self.x, self.y], self.getVission())
-        self.moveRelativeByAngle(r[0], self.speed * r[1])
-        self.decreaseFood(r[0])
+        self.r = r[0] * 360
+        self.moveRelativeByAngle(self.r, self.speed * r[1])
+        self.decreaseFood(0.2)
         pass
 
     def decreaseFood(self, decreaseFaktor=1):
@@ -116,3 +117,6 @@ class Agent(Object):
 
     def collect(self):
         return {"x": self.x, "y": self.y, "r": self.r, "width": self.width, "height": self.height, "id": self.id, "type": self.type, "foodlevel": self.foodlevel}
+
+    def collectInDetail(self):
+        return {"x": self.x, "y": self.y, "r": self.r, "width": self.width, "height": self.height, "id": self.id, "type": self.type, "foodlevel": self.foodlevel, "brain": self.brain.collect()}
