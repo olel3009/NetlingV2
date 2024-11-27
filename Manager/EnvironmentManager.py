@@ -1,13 +1,13 @@
 import logging
-from Quadtree import Quadtree, rect
-from Event import Events, CollissionEvent
+from Manager.QuadTreeManager import Quadtree, rect
+from Manager.EventManager import Events, CollissionEvent
 import random
-from Agent import Agent
-from Brain import Brain
-from Food import Food
-from IDManager import GenomeManagerInstance
+from Objects.Agent import Agent
+from Manager.CognitiveManager import Brain
+from Objects.Food import Food
+from Manager.IDManager import GenomeManagerInstance
 import neat
-config_path = "/config-feedforward"
+config_path = "config-feedforward"
 NEATConfig = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          "config-feedforward")
 
@@ -151,18 +151,10 @@ class Enviroment():
         except AssertionError as e:
             print(f"Mutation fehlgeschlagen: {e}. Initialisiere Genom neu.")
             child_genome.configure_new(GenomeManagerInstance.NEATConfig.genome_config)
-
-        # 6. Erstelle ein neues Gehirn für den Nachkommen
         brain = Brain()
         brain.genome = child_genome
         brain.net = neat.nn.FeedForwardNetwork.create(child_genome, GenomeManagerInstance.NEATConfig)
-
-        # 7. Erstelle den neuen Agenten
-
         new_agent = Agent(x, y, r, width, height, foodlevel, maxfoodlevel, noBrain=False, env=env)
         new_agent.brain = brain
-
-        # Debug-Ausgabe für den Nachkommen
         print(f"Neuer Agent erstellt mit ID: {child_genome.key} und Gehirn-Netzwerk.")
-
         return new_agent

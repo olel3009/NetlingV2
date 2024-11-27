@@ -1,6 +1,6 @@
 import logging
 
-from IDManager import IDManager
+from Manager.IDManager import IDManager
 
 class Object:
     def __init__(self, x, y, r, width, height, env):

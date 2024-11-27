@@ -1,6 +1,6 @@
 def test_quadtree_subdivision():
-    from Quadtree import Quadtree
-    from Object import Object
+    from Manager.QuadTreeManager import Quadtree
+    from Objects.Object import Object
     qt = Quadtree(100, 100, 0, 0, 3)
 
     obj2 = Object(25, 25, 0, 0, 0, env="test")
@@ -19,12 +19,12 @@ def test_quadtree_subdivision():
     assert qt.isSubdivided() == True
 
 def test_quadtree_insert_and_query():
-    from Quadtree import Quadtree
-    from Object import Object
+    from Manager.QuadTreeManager import Quadtree
+    from Objects.Object import Object
     qt = Quadtree(100, 100, 0, 0, 4)
     obj = Object(0, 0, 0, 0, 0, env="test")
     qt.insert(obj)
-    from Quadtree import rect
+    from Manager.QuadTreeManager import rect
     range1 = rect(0, 0, 100, 100)
 
     results = qt.query(range1, 0)
@@ -33,8 +33,8 @@ def test_quadtree_insert_and_query():
         assert level == 0
 
 def test_quadtree_query_specific_range():
-    from Quadtree import Quadtree, rect
-    from Object import Object
+    from Manager.QuadTreeManager import Quadtree, rect
+    from Objects.Object import Object
     qt = Quadtree(100, 100, 0, 0, 4)
     
     obj2 = Object(25, 25, 0, 0, 0, env="test")

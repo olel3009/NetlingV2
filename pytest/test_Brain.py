@@ -1,6 +1,6 @@
 def test_brain():
-    from Enviroment import Enviroment
-    from Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
+    from Objects.Agent import Agent
     env = Enviroment()
     agent = Agent(0, 0, 0, 10, 10, noBrain=False, env=env)
     env.addObjects(agent)
@@ -14,9 +14,8 @@ def test_brain():
     assert env.objects[0].brain.objToVector(v[0]) == [20.0, 0.0, 0.9]
 
 def test_mutation():
-    from Brain import Brain
-    from Enviroment import Enviroment
-    from Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
+    from Objects.Agent import Agent
 
     env = Enviroment()
     agent = Agent(0, 0, 0, 10, 10, noBrain=False, env=env)

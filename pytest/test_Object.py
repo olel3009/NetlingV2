@@ -1,5 +1,5 @@
 def test_object():
-    from Object import Object
+    from Objects.Object import Object
     obj = Object(0, 0, 0, 0, 0, env="test")
     assert obj.x == 0
     assert obj.y == 0

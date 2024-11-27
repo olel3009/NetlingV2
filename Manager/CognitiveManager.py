@@ -1,7 +1,7 @@
 import neat
 import random
 # Lade NEAT-Konfiguration aus der Config-Datei
-from IDManager import GenomeManagerInstance
+from Manager.IDManager import GenomeManagerInstance
 
 class Brain:
     def __init__(self):

@@ -1,27 +1,25 @@
 import math
 
-from NetworkManager import environment
-
 
 def test_agent_moveRelative():
-    from Agent import Agent
-    from Enviroment import Enviroment
+    from Objects.Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
     agent = Agent(50, 50, 0, 0, 0, noBrain=True, env=Enviroment())
     agent.moveRelative(1, 1)
     assert agent.x == 51
     assert agent.y == 51
 
 def test_agent_teleport():
-    from Agent import Agent
-    from Enviroment import Enviroment
+    from Objects.Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
     agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=Enviroment())
     agent.teleport(1, 1)
     assert agent.x == 1
     assert agent.y == 1
 
 def test_agent_moveRelativeByAngle():
-    from Agent import Agent
-    from Enviroment import Enviroment
+    from Objects.Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
     env = Enviroment()
     agent = Agent(50, 50, 0, 0, 0, noBrain=True, env=env)
     env.addObjects(agent)
@@ -31,9 +29,9 @@ def test_agent_moveRelativeByAngle():
 
 
 def test_agent_feed():
-    from Agent import Agent
-    from Food import Food
-    from Enviroment import Enviroment
+    from Objects.Agent import Agent
+    from Objects.Food import Food
+    from Manager.EnvironmentManager import Enviroment
     environment = Enviroment()
     agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=environment, fooodlevel=0)
     food = Food(0, 0, 0, 0, 0, 10, env=environment)
@@ -43,8 +41,8 @@ def test_agent_feed():
     assert agent.foodlevel == 100
 
 def test_brain():
-    from Agent import Agent
-    from Enviroment import Enviroment
+    from Objects.Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
     env = Enviroment()
     agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=env)
     env.addObjects(agent)
@@ -53,8 +51,8 @@ def test_brain():
     assert env.objects[0].y == 0
 
 def test_validMove():
-    from Agent import Agent
-    from Enviroment import Enviroment
+    from Objects.Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
     env = Enviroment()
     agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=env)
     assert agent.validMove(0, 0)
@@ -65,8 +63,8 @@ def test_validMove():
     assert not agent.validMove(0, 101)
 
 def test_decreaseFood():
-    from Agent import Agent
-    from Enviroment import Enviroment
+    from Objects.Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
     env = Enviroment()
     agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=env, fooodlevel=0)
     agent.decreaseFood()
@@ -74,8 +72,8 @@ def test_decreaseFood():
     assert len(env.eventManager) == 1
 
 def test_vision_rect():
-    from Agent import Agent
-    from Enviroment import Enviroment
+    from Objects.Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
     env = Enviroment()
     agent = Agent(50, 50, 0, 10, 10, noBrain=True, env=env)
     env.addObjects(agent)
@@ -90,8 +88,8 @@ def test_vision_rect():
 
 
 def test_filtered_vision():
-    from Agent import Agent
-    from Enviroment import Enviroment
+    from Objects.Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
 
     # Initialisiere die Umgebung
     env = Enviroment()
@@ -141,12 +139,12 @@ def test_filtered_vision():
         env.objects.pop()
 
 def test_testvision():
-    from Agent import Agent
-    from Enviroment import Enviroment
+    from Objects.Agent import Agent
+    from Manager.EnvironmentManager import Enviroment
     env = Enviroment()
     agent = Agent(50, 50, 0, 10, 10, fooodlevel=50, noBrain=True, env=env)
     env.addObjects(agent)
-    from Food import Food
+    from Objects.Food import Food
     env.addObjects(Food(80, 50, 0, 10, 10, 10, env=env))
     v = agent.getVission()
     assert len(v) == 1

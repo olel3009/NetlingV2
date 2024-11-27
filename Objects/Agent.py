@@ -1,8 +1,8 @@
-from Object import Object
-from Food import Food
-from Brain import Brain
-from Event import Event, Events
-from Quadtree import rect
+from Objects.Object import Object
+from Objects.Food import Food
+from Manager.CognitiveManager import Brain
+from Manager.EventManager import Event, Events
+from Manager.QuadTreeManager import rect
 import math
 
 class Agent(Object):
@@ -77,8 +77,6 @@ class Agent(Object):
         if self.foodlevel > self.maxfoodlevel:
             self.foodlevel = self.maxfoodlevel
         self.logger.debug(f"{self.type} food level is now {self.foodlevel}")
-
-    import math
 
     def getVisionRect(self):
         vision_distance = 30

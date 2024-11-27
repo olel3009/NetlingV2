@@ -1,7 +1,7 @@
-from Quadtree import Quadtree
-from Enviroment import Enviroment
-from Agent import Agent
-from Food import Food
+from Manager.QuadTreeManager import Quadtree
+from Manager.EnvironmentManager import Enviroment
+from Objects.Agent import Agent
+from Objects.Food import Food
 
 
 class TrainingCenter:

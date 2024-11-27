@@ -1,4 +1,4 @@
-from Object import Object
+from Objects.Object import Object
 class Food(Object):
     def __init__(self, x, y, r, width, height, foodlevel=10, env=None):
         super().__init__(x, y, r, width, height, env)
