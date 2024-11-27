@@ -48,6 +48,8 @@ class Enviroment():
                 x = random.randint(rad.x, rad.width + rad.x)
                 y = random.randint(rad.y, rad.height + rad.y)
             obj = instance(x, y, 0,width, height, env=self, **kwargs)
+            if isinstance(obj, Agent):
+                obj.brain.mutate_randomly(10)
             self.addObjects(obj)
             self.logger.debug(f"Object spawned at ({obj.x}, {obj.y})")
 
@@ -131,7 +133,9 @@ class Enviroment():
         print(
             f"Erzeuge Nachkomme aus Eltern:\n- Parent1 Fitness: {parent1.foodlevel}\n- Parent2 Fitness: {parent2.foodlevel}")
         if parent1.foodlevel < 50 or parent2.foodlevel < 50:
-            return Agent(x, y, r, width, height, foodlevel, maxfoodlevel, env=env)
+            a = Agent(x, y, r, width, height, foodlevel, maxfoodlevel, env=env)
+            a.brain.mutate_randomly(10)
+            return a
         parent1.brain.genome.fitness = parent1.foodlevel
         parent2.brain.genome.fitness = parent2.foodlevel
 

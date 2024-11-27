@@ -81,39 +81,37 @@ class Agent(Object):
     import math
 
     def getVisionRect(self):
-        # Sichtweite in Pixel
         vision_distance = 30
-
-        # Breite des Sichtfelds (entsprechend 90 Grad)
-        vision_width = vision_distance * math.tan(math.radians(45)) * 2  # 90 Grad Sichtfeld
-
-        # Mittelpunkt des Sichtfelds
+        vision_width = vision_distance * math.tan(math.radians(45)) * 2  # 90 degrees FOV
         center_x = self.x + self.width / 2 + vision_distance * math.cos(math.radians(self.r))
         center_y = self.y + self.height / 2 + vision_distance * math.sin(math.radians(self.r))
-
-        # Position des Rechtecks (oberer linker Punkt)
         rect_x = center_x - vision_width / 2
-        rect_y = center_y - vision_distance / 2  # Zentrierung um die Figur
-
-        # Rechteck erzeugen
+        rect_y = center_y - vision_distance / 2
         return rect(rect_x, rect_y, vision_width, vision_distance)
 
     def getVission(self):
         def _isInVissionAngle(obj):
-            angle_to_obj = math.atan2(obj.y - self.y, obj.x - self.x)
-            angle_diff = abs(angle_to_obj - self.r)
-            return angle_diff <= math.pi / 4  # 90 degrees vision cone
+            # Calculate angle to the object
+            angle_to_obj = math.degrees(math.atan2(obj.y - self.y, obj.x - self.x)) % 360
+            angle_diff = abs((angle_to_obj - self.r + 180) % 360 - 180)
+            return angle_diff <= 45  # 90-degree vision cone
 
         def _isInVissionDistance(obj):
+            # Calculate distance to the object
             distance = math.sqrt((obj.x - self.x) ** 2 + (obj.y - self.y) ** 2)
-            angle_to_obj = math.atan2(obj.y - self.y, obj.x - self.x)
-            return (distance, angle_to_obj, obj) if distance <= 30 else False
+            angle_to_obj = math.degrees(math.atan2(obj.y - self.y, obj.x - self.x)) % 360
+            return (distance, angle_to_obj, obj) if distance <= 30 else None
 
-        vission = self.env.quadtree.query(self.getVisionRect(), 0)
-        filtered_vission = [obj for obj in vission if _isInVissionAngle(obj[1])]
-        filtered_vission = [eval for v in filtered_vission if (eval := _isInVissionDistance(v[1]))]
+        # Get raw vision objects (tuples from quadtree)
+        vision_objects = [entry[1] for entry in self.env.quadtree.query(self.getVisionRect(), 0)]
 
-        return filtered_vission[:3] if len(filtered_vission) > 3 else filtered_vission
+        # Filter objects in the vision cone and within distance
+        filtered_vission = [
+            _isInVissionDistance(obj) for obj in vision_objects if _isInVissionAngle(obj)
+        ]
+
+        # Remove None values and limit to at most 3 results
+        return [v for v in filtered_vission if v is not None][:3]
 
     def collect(self):
         return {"x": self.x, "y": self.y, "r": self.r, "width": self.width, "height": self.height, "id": self.id, "type": self.type, "foodlevel": self.foodlevel}

@@ -47,7 +47,7 @@ class Brain:
         """
         return {"net": self.net.node_evals, "keyGenome": self.genome.key}
 
-    def mutate_randomly(self):
+    def mutate_randomly(self, count=1):
         mutation_operations = [
             self.genome.mutate_add_node,
             self.genome.mutate_add_connection,
@@ -56,7 +56,7 @@ class Brain:
         ]
 
         success = False
-        for _ in range(2):  # Maximal 10 Versuche
+        for _ in range(count):  # Maximal 10 Versuche
             mutation = random.choice(mutation_operations)
             try:
                 # Prüfe, ob die Mutation `genome_config` erwartet

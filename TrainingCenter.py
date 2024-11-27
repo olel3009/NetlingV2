@@ -34,10 +34,12 @@ def initialize_training_centers(count, countOfFood, countOfAgents, width, height
         tc = TrainingCenter(countOfFood, countOfAgents, width, height)
         # Add food objects
         for _ in range(countOfFood):
-            tc.env.addObjects(Food(0, 0, 0, 10, 10, env=tc.env))
+            tc.env.addObjects(Food(0, 0, 0, 10, 10, env=tc.env, foodlevel=30))
         # Add agent objects
         for _ in range(countOfAgents):
-            tc.env.addObjects(Agent(0, 0, 0, 10, 10, 50, 100, env=tc.env))
+            a = Agent(0, 0, 0, 10, 10, 50, 100, env=tc.env)
+            a.brain.mutate_randomly(10)
+            tc.env.addObjects(a)
         training_centers.append(tc)
     return training_centers
 
@@ -58,9 +60,16 @@ def main():
 
         agents1 = [obj for obj in training_centers[0].env.objects if isinstance(obj, Agent)]
         agents2 = [obj for obj in training_centers[1].env.objects if isinstance(obj, Agent)]
+        try:
+            agents1[0].foodlevel = 100
+        except:
+            agents1.append(Agent(0, 0, 0, 10, 10, 50, 100, env=training_centers[0].env))
 
-        agents1[0].foodlevel = 100
-        agents2[0].foodlevel = 100
+        try:
+            agents2[0].foodlevel = 100
+        except:
+            agents2.append(Agent(0, 0, 0, 10, 10, 50, 100, env=training_centers[1].env))
+
         print("Creating offspring from the last two training centers...")
         # Create 1000 new training centers
         new_training_centers = []

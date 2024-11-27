@@ -139,3 +139,25 @@ def test_filtered_vision():
 
         # Entferne den zweiten Agenten für den nächsten Test
         env.objects.pop()
+
+def test_testvision():
+    from Agent import Agent
+    from Enviroment import Enviroment
+    env = Enviroment()
+    agent = Agent(50, 50, 0, 10, 10, fooodlevel=50, noBrain=True, env=env)
+    env.addObjects(agent)
+    from Food import Food
+    env.addObjects(Food(80, 50, 0, 10, 10, 10, env=env))
+    v = agent.getVission()
+    assert len(v) == 1
+
+    agent.moveRelativeByAngle(0, 30)
+    env.update()
+    assert len(env.objects) == 1
+
+    agent.teleport(50, 50, 180)
+
+    assert agent.r == 180
+    env.addObjects(Food(30, 50, 0, 10, 10, 10, env=env))
+    v = agent.getVission()
+    assert len(v) == 1

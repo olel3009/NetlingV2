@@ -23,7 +23,7 @@ def test_mutation():
     env.addObjects(agent)
 
     a = agent.brain.think([0, 1], agent.getVission())
-    agent.brain.mutate_randomly()
+    agent.brain.mutate_randomly(count=10)
     b = agent.brain.think([0, 1], agent.getVission())
 
     assert a != b
