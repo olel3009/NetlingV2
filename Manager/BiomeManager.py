@@ -1,28 +1,11 @@
 from Manager.BiomeHelpers.ClusterFinder import ClusterFinder
+
 import numpy as np
 import matplotlib.pyplot as plt
 from perlin_noise import PerlinNoise
-
-class Biome:
-    def __init__(self, cluster, clusterId):
-        self.cluster = cluster
-        self.id = clusterId
-
-
-class Fauna(Biome):
-    name = "Fauna"
-    def __init__(self, cluster, id):
-        super().__init__(cluster, id)
-
-class Savanne(Biome):
-    name = "Savanne"
-    def __init__(self, cluster, id):
-        super().__init__(cluster, id)
-
-class Tundra(Biome):
-    name = "Tundra"
-    def __init__(self, cluster, id):
-        super().__init__(cluster, id)
+from Biomes.Tundra import Tundra
+from Biomes.Fauna import Fauna
+from Biomes.Savanne import Savanne
 
 class BiomeManager:
     def __init__(self, width, height, numBiomes):

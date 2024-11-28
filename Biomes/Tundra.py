@@ -1,3 +1,5 @@
 from Biomes.Biome import Biome
 class Tundra(Biome):
-    pass
+    name = "Tundra"
+    def __init__(self, cluster, id):
+        super().__init__(cluster, id)
