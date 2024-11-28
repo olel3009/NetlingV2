@@ -13,7 +13,7 @@ class TestEnvironmentManager(unittest.TestCase):
     def setUp(self):
         """Setup für jeden Test."""
         self.env = Enviroment()
-        logging.info("Environment initialized for test.")
+        logging.info("Environment initialized for Playground.")
 
     def test_addObjects(self):
         """Test, ob Objekte korrekt hinzugefügt werden."""

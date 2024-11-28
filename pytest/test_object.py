@@ -4,7 +4,7 @@ from Objects.Object import Object
 class TestObject(unittest.TestCase):
     def setUp(self):
         """Setup für jeden Test."""
-        self.env = "test"  # Eine Beispielumgebung
+        self.env = "Playground"  # Eine Beispielumgebung
         self.obj = Object(0, 0, 0, 10, 10, env=self.env)
 
     def test_initialization(self):
@@ -13,7 +13,7 @@ class TestObject(unittest.TestCase):
         self.assertEqual(self.obj.y, 0, "Initial y-coordinate should be 0.")
         self.assertEqual(self.obj.width, 10, "Width should be 10.")
         self.assertEqual(self.obj.height, 10, "Height should be 10.")
-        self.assertEqual(self.obj.env, self.env, "Environment should be 'test'.")
+        self.assertEqual(self.obj.env, self.env, "Environment should be 'Playground'.")
 
     def test_set_position(self):
         """Testet das Setzen neuer Positionen."""

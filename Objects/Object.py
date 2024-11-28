@@ -8,7 +8,7 @@ class Object:
         self.x = x
         self.y = y
         self.r = r
-        if env is None and not env=="test":
+        if env is None and not env=="Playground":
             self.logger.error("Enviroment is None")
             raise ValueError
         self.env = env

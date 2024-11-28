@@ -7,16 +7,16 @@ class TestQuadtree(unittest.TestCase):
         """Testet die Unterteilung des Quadtrees nach Einfügen von Objekten."""
         qt = Quadtree(100, 100, 0, 0, 3)
 
-        obj2 = Object(25, 25, 0, 0, 0, env="test")
+        obj2 = Object(25, 25, 0, 0, 0, env="Playground")
         qt.insert(obj2)
 
-        obj3 = Object(25, 75, 0, 0, 0, env="test")
+        obj3 = Object(25, 75, 0, 0, 0, env="Playground")
         qt.insert(obj3)
 
-        obj4 = Object(75, 25, 0, 0, 0, env="test")
+        obj4 = Object(75, 25, 0, 0, 0, env="Playground")
         qt.insert(obj4)
 
-        obj5 = Object(75, 75, 0, 0, 0, env="test")
+        obj5 = Object(75, 75, 0, 0, 0, env="Playground")
         qt.insert(obj5)
 
         self.assertTrue(qt.isSubdivided(), "Quadtree should be subdivided after inserting 4 objects.")
@@ -25,7 +25,7 @@ class TestQuadtree(unittest.TestCase):
         """Testet das Einfügen und Abfragen von Objekten im Quadtree."""
         qt = Quadtree(100, 100, 0, 0, 4)
 
-        obj = Object(0, 0, 0, 0, 0, env="test")
+        obj = Object(0, 0, 0, 0, 0, env="Playground")
         qt.insert(obj)
 
         range1 = rect(0, 0, 100, 100)
@@ -39,19 +39,19 @@ class TestQuadtree(unittest.TestCase):
         """Testet das Abfragen eines spezifischen Bereichs im Quadtree."""
         qt = Quadtree(100, 100, 0, 0, 4)
 
-        obj2 = Object(25, 25, 0, 0, 0, env="test")
+        obj2 = Object(25, 25, 0, 0, 0, env="Playground")
         qt.insert(obj2)
 
-        obj3 = Object(25, 75, 0, 0, 0, env="test")
+        obj3 = Object(25, 75, 0, 0, 0, env="Playground")
         qt.insert(obj3)
 
-        obj4 = Object(75, 25, 0, 0, 0, env="test")
+        obj4 = Object(75, 25, 0, 0, 0, env="Playground")
         qt.insert(obj4)
 
-        obj5 = Object(75, 75, 0, 0, 0, env="test")
+        obj5 = Object(75, 75, 0, 0, 0, env="Playground")
         qt.insert(obj5)
 
-        obj6 = Object(50, 50, 0, 0, 0, env="test")
+        obj6 = Object(50, 50, 0, 0, 0, env="Playground")
         qt.insert(obj6)
 
         self.assertTrue(qt.isSubdivided(), "Quadtree should be subdivided after inserting multiple objects.")

@@ -8,7 +8,7 @@ import math
 class Agent(Object):
     def __init__(self, x, y, r, width, height, fooodlevel = 100, maxfoodlevel = 100, noBrain = False, env = None):
         if env is None and noBrain:
-            env = "test"
+            env = "Playground"
         super().__init__(x, y, r, width, height, env)
         self.logger.debug(f"{self.type} created at ({self.x}, {self.y})")
         self.speed = 1

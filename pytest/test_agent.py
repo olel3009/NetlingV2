@@ -78,7 +78,7 @@ class TestAgent(unittest.TestCase):
         self.env.addObjects(agent)
         vision = agent.getVission()
         self.assertEqual(vision, [])
-        logging.info("Initial vision test passed with empty environment.")
+        logging.info("Initial vision Playground passed with empty environment.")
 
         agent1 = Agent(80, 55, 0, 0, 0, noBrain=True, env=self.env)
         self.env.addObjects(agent1)
