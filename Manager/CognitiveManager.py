@@ -49,7 +49,7 @@ class Brain:
         """
         Sammelt die Informationen des Gehirns in einem Dictionary.
         """
-        return {"net": self.net.node_evals, "keyGenome": self.genome.key}
+        return self.genome_to_json()
 
     def mutate_randomly(self, count=1):
         mutation_operations = [
@@ -80,3 +80,32 @@ class Brain:
             mutation(GenomeManagerInstance.NEATConfig.genome_config)
         else:
             mutation()
+    def genome_to_json(self):
+        """Konvertiert ein NEAT-Genom in ein JSON-Format."""
+        nodes = []
+        connections = []
+
+        # Extrahiere Knoteninformationen
+        for node_id, node in self.genome.nodes.items():
+            nodes.append({
+                "id": node_id,
+                "bias": node.bias,
+                "activation": node.activation,
+                "response": node.response
+            })
+
+        # Extrahiere Verbindungen
+        for conn_key, conn in self.genome.connections.items():
+            if conn.enabled:  # Nur aktive Verbindungen hinzufügen
+                connections.append({
+                    "input": conn_key[0],
+                    "output": conn_key[1],
+                    "weight": conn.weight,
+                    "enabled": conn.enabled
+                })
+
+        # Rückgabe als JSON-kompatibles Dictionary
+        return {
+            "nodes": nodes,
+            "connections": connections
+        }
