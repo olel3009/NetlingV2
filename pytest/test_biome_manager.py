@@ -16,13 +16,26 @@ def test_biome():
 def test_biome_get_at_point():
     env = Enviroment()
     biomeManager = BiomeManager(env.width, env.height, 2)
-    assert biomeManager.get_at_point(0, 0) == biomeManager.biomeMap[0, 0]
-    assert biomeManager.get_at_point(50, 50) == biomeManager.biomeMap[50, 50]
+    assert biomeManager.getBiomeAt(0, 0) == biomeManager.biomeMap[0, 0]
+    assert biomeManager.getBiomeAt(50, 50) == biomeManager.biomeMap[50, 50]
 
 def test_biome_sum_ofBiomes():
     env = Enviroment()
     biomeManager = BiomeManager(env.width, env.height, 2)
-    assert len(biomeManager.Biomes) == 2
+    assert len(biomeManager.uniqueKeys) == 2
 
     biomeManager = BiomeManager(env.width, env.height, 3)
-    assert len(biomeManager.Biomes) == 3
+    assert len(biomeManager.uniqueKeys) == 3
+
+def test_biome_classes():
+    from Manager.BiomeManager import Biome
+    env = Enviroment()
+    biomeManager = BiomeManager(env.width, env.height, 2)
+    assert len(biomeManager.biomeClasses) == 15
+    for classes in biomeManager.biomeClasses:
+        assert isinstance(classes, Biome)
+
+def test_biome_class_map():
+    env = Enviroment()
+    biomeManager = BiomeManager(env.width, env.height, 2)
+    assert len(np.unique(biomeManager.biomeMapClass)) == 15

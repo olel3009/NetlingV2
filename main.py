@@ -54,6 +54,9 @@ async def getObject(id: int):
 async def getENVSettings():
     return {"width": environment.width, "height": environment.height}
 
+@app.get("/getBiome")
+async def getBiome():
+    return environment.biomeManager.biomeClasses
 @app.on_event("startup")
 async def startup_event():
     asyncio.create_task(update_environment())

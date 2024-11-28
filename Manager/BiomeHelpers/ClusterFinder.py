@@ -1,3 +1,5 @@
+import numpy as np
+
 class ClusterFinder:
     def __init__(self, biome_map):
         self.biome_map = biome_map
@@ -15,11 +17,16 @@ class ClusterFinder:
                     cluster = self.floodfill_recursive(x, y)
                     if cluster:
                         self.clusters.append(cluster)
-        self.clusterDict = {}
+
+        self.clusterDict = {biome_type: {} for biome_type in np.unique(self.biome_map)}
         id = 0
         for cluster in self.clusters:
-            self.clusterDict[self.biome_map[cluster[0][0], cluster[0][1]]][id] = cluster
-        print(self.clusterDict)
+            # Ein beliebiges Element aus dem Set nehmen, um den Biome-Typ zu bestimmen
+            first_element = next(iter(cluster))
+            biome_type = int(self.biome_map[first_element[0]][first_element[1]])
+            self.clusterDict[biome_type][id] = cluster
+            id += 1
+        self.clusterDict = {int(k): v for k, v in self.clusterDict.items()}
         return self.clusterDict
 
     def get_neighbours(self, x, y):
