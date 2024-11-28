@@ -1,10 +1,12 @@
 import neat
 import random
+import logging
 # Lade NEAT-Konfiguration aus der Config-Datei
 from Manager.IDManager import GenomeManagerInstance
 
 class Brain:
-    def __init__(self):
+    def __init__(self, repeatOfMutation=10):
+        self.logger = logging.getLogger(__name__)
         # Erstelle ein neues Genom mit einer zufälligen ID
         genome_id = GenomeManagerInstance.generateID()
         # Stelle sicher, dass die Konfiguration korrekt geladen wurde
@@ -17,6 +19,8 @@ class Brain:
 
         # Erstelle das neuronale Netz
         self.net = neat.nn.FeedForwardNetwork.create(self.genome, GenomeManagerInstance.NEATConfig)
+        for _ in range(repeatOfMutation):
+            self._apply_mutation(self.genome.mutate_add_connection)
 
     def think(self, inputs, lens=None):
         """
@@ -59,18 +63,20 @@ class Brain:
         for _ in range(count):  # Maximal 10 Versuche
             mutation = random.choice(mutation_operations)
             try:
-                # Prüfe, ob die Mutation `genome_config` erwartet
-                if mutation in [self.genome.mutate_add_node, self.genome.mutate_add_connection, self.genome.mutate_delete_node]:
-                    mutation(GenomeManagerInstance.NEATConfig.genome_config)
-                else:
-                    mutation()
-                print(f"Mutation erfolgreich: {mutation.__name__}")
+                self._apply_mutation(mutation)
+                self.logger.debug(f"Mutation erfolgreich: {mutation}")
                 success = True
             except Exception as e:
-                print(f"Mutation fehlgeschlagen: {mutation.__name__}, Fehler: {e}")
-
+                self.logger.debug(f"Mutation fehlgeschlagen: {e}")
         if not success:
-            print("Keine gültige Mutation möglich.")
+            self.logger.debug("Mutation fehlgeschlagen. Initialisiere Genom neu.")
 
         # Netzwerk nach Mutation aktualisieren
         self.net = neat.nn.FeedForwardNetwork.create(self.genome, GenomeManagerInstance.NEATConfig)
+
+    def _apply_mutation(self, mutation):
+        # Prüfe, ob die Mutation `genome_config` erwartet
+        if mutation in [self.genome.mutate_add_node, self.genome.mutate_add_connection, self.genome.mutate_delete_node]:
+            mutation(GenomeManagerInstance.NEATConfig.genome_config)
+        else:
+            mutation()

@@ -19,31 +19,6 @@ class Agent(Object):
         if not noBrain:
             self.brain = Brain()
 
-    def teleport(self, x, y, r = None):
-        self.x = x
-        self.y = y
-        if r is not None:
-            self.r = r
-        self.logger.debug(f"{self.type} teleported to ({self.x}, {self.y})")
-
-
-    def moveRelative(self, dx, dy):
-        self.x += dx
-        self.y += dy
-        if not self.validMove(self.x, self.y):
-            self.logger.debug(f"{self.type} can't move to ({self.x}, {self.y})")
-            return
-        self.logger.debug(f"{self.type} moved to ({self.x}, {self.y})")
-
-    def moveRelativeByAngle(self, angle, distance):
-        dx = distance * math.cos(angle)
-        dy = distance * math.sin(angle)
-        if not self.validMove(self.x + dx, self.y + dy):
-            self.logger.debug(f"{self.type} can't move to ({self.x + dx}, {self.y + dy})")
-            return
-        self.moveRelative(dx, dy)
-        self.logger.debug(f"{self.type} moved to ({self.x}, {self.y})")
-
     def validMove(self, x, y):
         if x < 0 or x > self.env.width or y < 0 or y > self.env.height:
             return False

@@ -1,12 +1,16 @@
 import asyncio
 import logging
+import unittest
+
 import uvicorn
 import sys
+from unittest import TestLoader, TextTestRunner
+import unittest
+from unittest import TestLoader
 from pathlib import Path
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocketDisconnect
-
 from Objects.Food import Food
 from Objects.Agent import Agent
 from Manager.EnvironmentManager import Enviroment

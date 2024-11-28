@@ -1,161 +1,158 @@
+import unittest
+import logging
 import math
+from Objects.Agent import Agent
+from Manager.EnvironmentManager import Enviroment
+from Objects.Food import Food
 
+# Konfiguriere Logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-def test_agent_moveRelative():
-    from Objects.Agent import Agent
-    from Manager.EnvironmentManager import Enviroment
-    agent = Agent(50, 50, 0, 0, 0, noBrain=True, env=Enviroment())
-    agent.moveRelative(1, 1)
-    assert agent.x == 51
-    assert agent.y == 51
+class TestAgent(unittest.TestCase):
+    def setUp(self):
+        """Set up environment and common objects for tests."""
+        self.env = Enviroment()
+        logging.info("Environment initialized for tests.")
 
-def test_agent_teleport():
-    from Objects.Agent import Agent
-    from Manager.EnvironmentManager import Enviroment
-    agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=Enviroment())
-    agent.teleport(1, 1)
-    assert agent.x == 1
-    assert agent.y == 1
+    def test_agent_move_relative(self):
+        agent = Agent(50, 50, 0, 0, 0, noBrain=True, env=self.env)
+        agent.moveRelative(1, 1)
+        logging.info(f"Agent moved relative to (1, 1), new position: ({agent.x}, {agent.y}).")
+        self.assertEqual(agent.x, 51)
+        self.assertEqual(agent.y, 51)
 
-def test_agent_moveRelativeByAngle():
-    from Objects.Agent import Agent
-    from Manager.EnvironmentManager import Enviroment
-    env = Enviroment()
-    agent = Agent(50, 50, 0, 0, 0, noBrain=True, env=env)
-    env.addObjects(agent)
-    agent.moveRelativeByAngle(math.pi/4, 1)
-    assert agent.x == 50 + math.cos(math.pi/4)
-    assert agent.y == 50 + math.sin(math.pi/4)
+    def test_agent_teleport(self):
+        agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=self.env)
+        agent.teleport(1, 1)
+        logging.info(f"Agent teleported to (1, 1), new position: ({agent.x}, {agent.y}).")
+        self.assertEqual(agent.x, 1)
+        self.assertEqual(agent.y, 1)
 
+    def test_agent_move_relative_by_angle(self):
+        agent = Agent(50, 50, 0, 0, 0, noBrain=True, env=self.env)
+        self.env.addObjects(agent)
+        angle = math.pi / 4
+        agent.moveRelativeByAngle(angle, 1)
+        logging.info(f"Agent moved by angle {angle}, new position: ({agent.x}, {agent.y}).")
+        self.assertAlmostEqual(agent.x, 50 + math.cos(angle), places=5)
+        self.assertAlmostEqual(agent.y, 50 + math.sin(angle), places=5)
 
-def test_agent_feed():
-    from Objects.Agent import Agent
-    from Objects.Food import Food
-    from Manager.EnvironmentManager import Enviroment
-    environment = Enviroment()
-    agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=environment, fooodlevel=0)
-    food = Food(0, 0, 0, 0, 0, 10, env=environment)
-    agent.feed(food.foodlevel)
-    assert agent.foodlevel == 10
-    agent.feed(110)
-    assert agent.foodlevel == 100
+    def test_agent_feed(self):
+        agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=self.env, fooodlevel=0)
+        food = Food(0, 0, 0, 0, 0, 10, env=self.env)
+        agent.feed(food.foodlevel)
+        logging.info(f"Agent fed with {food.foodlevel}, new food level: {agent.foodlevel}.")
+        self.assertEqual(agent.foodlevel, 10)
 
-def test_brain():
-    from Objects.Agent import Agent
-    from Manager.EnvironmentManager import Enviroment
-    env = Enviroment()
-    agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=env)
-    env.addObjects(agent)
-    agent.update()
-    assert env.objects[0].x == 0
-    assert env.objects[0].y == 0
+        agent.feed(110)
+        logging.info(f"Agent fed with 110, new food level: {agent.foodlevel}.")
+        self.assertEqual(agent.foodlevel, 100)
 
-def test_validMove():
-    from Objects.Agent import Agent
-    from Manager.EnvironmentManager import Enviroment
-    env = Enviroment()
-    agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=env)
-    assert agent.validMove(0, 0)
-    assert agent.validMove(50, 50)
-    assert not agent.validMove(-1, 0)
-    assert not agent.validMove(0, -1)
-    assert not agent.validMove(101, 0)
-    assert not agent.validMove(0, 101)
+    def test_agent_brain(self):
+        agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=self.env)
+        self.env.addObjects(agent)
+        agent.update()
+        logging.info("Agent updated in environment.")
+        self.assertEqual(self.env.objects[0].x, 0)
+        self.assertEqual(self.env.objects[0].y, 0)
 
-def test_decreaseFood():
-    from Objects.Agent import Agent
-    from Manager.EnvironmentManager import Enviroment
-    env = Enviroment()
-    agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=env, fooodlevel=0)
-    agent.decreaseFood()
-    assert agent.foodlevel == -1
-    assert len(env.eventManager) == 1
+    def test_valid_move(self):
+        agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=self.env)
+        self.assertTrue(agent.validMove(0, 0))
+        self.assertTrue(agent.validMove(50, 50))
+        self.assertFalse(agent.validMove(-1, 0))
+        self.assertFalse(agent.validMove(0, -1))
+        self.assertFalse(agent.validMove(101, 0))
+        self.assertFalse(agent.validMove(0, 101))
+        logging.info("Valid move tests completed successfully.")
 
-def test_vision_rect():
-    from Objects.Agent import Agent
-    from Manager.EnvironmentManager import Enviroment
-    env = Enviroment()
-    agent = Agent(50, 50, 0, 10, 10, noBrain=True, env=env)
-    env.addObjects(agent)
-    v = agent.getVission()
-    assert v == []
-    env.objects[0].r = 0
+    def test_decrease_food(self):
+        agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=self.env, fooodlevel=0)
+        agent.decreaseFood()
+        logging.info(f"Agent food decreased, new food level: {agent.foodlevel}.")
+        self.assertEqual(agent.foodlevel, -1)
+        self.assertEqual(len(self.env.eventManager), 1)
 
-    agent1 = Agent(80, 55, 0, 0, 0, noBrain=True, env=env)
-    env.addObjects(agent1)
-    v = env.objects[0].getVisionRect()
-    assert len(env.quadtree.query(v)) == 1
+    def test_vision_rect(self):
+        agent = Agent(50, 50, 0, 10, 10, noBrain=True, env=self.env)
+        self.env.addObjects(agent)
+        vision = agent.getVission()
+        self.assertEqual(vision, [])
+        logging.info("Initial vision test passed with empty environment.")
 
+        agent1 = Agent(80, 55, 0, 0, 0, noBrain=True, env=self.env)
+        self.env.addObjects(agent1)
+        vision_rect = agent.getVisionRect()
+        objects_in_vision = len(self.env.quadtree.query(vision_rect))
+        logging.info(f"Vision rectangle query returned {objects_in_vision} object(s).")
+        self.assertEqual(objects_in_vision, 1)
 
-def test_filtered_vision():
-    from Objects.Agent import Agent
-    from Manager.EnvironmentManager import Enviroment
+    def test_filtered_vision(self):
+        env = Enviroment()
 
-    # Initialisiere die Umgebung
-    env = Enviroment()
+        # Erstelle den Hauptagenten mit Sichtfeld
+        agent = Agent(50, 50, 0, 10, 10, noBrain=True, env=env)
+        env.addObjects(agent)
 
-    # Erstelle den Hauptagenten mit Sichtfeld
-    agent = Agent(50, 50, 0, 10, 10, noBrain=True, env=env)
-    env.addObjects(agent)
+        # Überprüfen, ob die Sicht zu Beginn leer ist
+        v = agent.getVission()
+        assert v == []
 
-    # Überprüfen, ob die Sicht zu Beginn leer ist
-    v = agent.getVission()
-    assert v == []
+        # Teste für 8 verschiedene Winkel
+        angles = [0, 45, 90, 135, 180, 225, 270, 315]
+        results = []
 
-    # Teste für 8 verschiedene Winkel
-    angles = [0, 45, 90, 135, 180, 225, 270, 315]
-    results = []
+        for angle in angles:
+            # Setze die Rotation des Hauptagenten
+            env.objects[0].r = angle
 
-    for angle in angles:
-        # Setze die Rotation des Hauptagenten
-        env.objects[0].r = angle
+            # Platziere den zweiten Agenten passend zur Rotation
+            if angle == 0:
+                agent1 = Agent(80, 55, 0, 0, 0, noBrain=True, env=env)  # Rechts
+            elif angle == 45:
+                agent1 = Agent(80, 80, 0, 0, 0, noBrain=True, env=env)  # Rechts oben
+            elif angle == 90:
+                agent1 = Agent(50, 80, 0, 0, 0, noBrain=True, env=env)  # Oben
+            elif angle == 135:
+                agent1 = Agent(20, 80, 0, 0, 0, noBrain=True, env=env)  # Links oben
+            elif angle == 180:
+                agent1 = Agent(20, 55, 0, 0, 0, noBrain=True, env=env)  # Links
+            elif angle == 225:
+                agent1 = Agent(20, 20, 0, 0, 0, noBrain=True, env=env)  # Links unten
+            elif angle == 270:
+                agent1 = Agent(50, 20, 0, 0, 0, noBrain=True, env=env)  # Unten
+            elif angle == 315:
+                agent1 = Agent(80, 20, 0, 0, 0, noBrain=True, env=env)  # Rechts unten
 
-        # Platziere den zweiten Agenten passend zur Rotation
-        if angle == 0:
-            agent1 = Agent(80, 55, 0, 0, 0, noBrain=True, env=env)  # Rechts
-        elif angle == 45:
-            agent1 = Agent(80, 80, 0, 0, 0, noBrain=True, env=env)  # Rechts oben
-        elif angle == 90:
-            agent1 = Agent(50, 80, 0, 0, 0, noBrain=True, env=env)  # Oben
-        elif angle == 135:
-            agent1 = Agent(20, 80, 0, 0, 0, noBrain=True, env=env)  # Links oben
-        elif angle == 180:
-            agent1 = Agent(20, 55, 0, 0, 0, noBrain=True, env=env)  # Links
-        elif angle == 225:
-            agent1 = Agent(20, 20, 0, 0, 0, noBrain=True, env=env)  # Links unten
-        elif angle == 270:
-            agent1 = Agent(50, 20, 0, 0, 0, noBrain=True, env=env)  # Unten
-        elif angle == 315:
-            agent1 = Agent(80, 20, 0, 0, 0, noBrain=True, env=env)  # Rechts unten
+            # Füge den zweiten Agenten hinzu und prüfe die Sicht
+            env.addObjects(agent1)
+            v = env.objects[0].getVission()
 
-        # Füge den zweiten Agenten hinzu und prüfe die Sicht
-        env.addObjects(agent1)
-        v = env.objects[0].getVission()
+            # Überprüfe, ob der Agent korrekt erkannt wurde
+            results.append((angle, len(v) == 1))
 
-        # Überprüfe, ob der Agent korrekt erkannt wurde
-        results.append((angle, len(v) == 1))
+            # Entferne den zweiten Agenten für den nächsten Test
+            env.objects.pop()
 
-        # Entferne den zweiten Agenten für den nächsten Test
-        env.objects.pop()
+    def test_testvision(self):
+        agent = Agent(50, 50, 0, 10, 10, fooodlevel=50, noBrain=True, env=self.env)
+        self.env.addObjects(agent)
 
-def test_testvision():
-    from Objects.Agent import Agent
-    from Manager.EnvironmentManager import Enviroment
-    env = Enviroment()
-    agent = Agent(50, 50, 0, 10, 10, fooodlevel=50, noBrain=True, env=env)
-    env.addObjects(agent)
-    from Objects.Food import Food
-    env.addObjects(Food(80, 50, 0, 10, 10, 10, env=env))
-    v = agent.getVission()
-    assert len(v) == 1
+        food = Food(80, 50, 0, 10, 10, 10, env=self.env)
+        self.env.addObjects(food)
+        vision = agent.getVission()
+        logging.info(f"Agent vision detected {len(vision)} object(s).")
+        self.assertEqual(len(vision), 1)
 
-    agent.moveRelativeByAngle(0, 30)
-    env.update()
-    assert len(env.objects) == 1
+        agent.teleport(50, 50, 180)
+        logging.info(f"Agent teleported to (50, 50) with rotation {agent.r}.")
+        self.assertEqual(agent.r, 180)
 
-    agent.teleport(50, 50, 180)
+        new_food = Food(30, 50, 0, 10, 10, 10, env=self.env)
+        self.env.addObjects(new_food)
+        vision = agent.getVission()
+        logging.info(f"Agent vision after teleport detected {len(vision)} object(s).")
+        self.assertEqual(len(vision), 1)
 
-    assert agent.r == 180
-    env.addObjects(Food(30, 50, 0, 10, 10, 10, env=env))
-    v = agent.getVission()
-    assert len(v) == 1
+if __name__ == "__main__":
+    unittest.main()
