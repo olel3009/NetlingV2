@@ -26,3 +26,13 @@ def test_mutation():
     b = agent.brain.think([0, 1], agent.getVission())
 
     assert a != b
+
+def test_brain_to_json():
+    from Manager.EnvironmentManager import Enviroment
+    from Objects.Agent import Agent
+
+    env = Enviroment()
+    agent = Agent(0, 0, 0, 10, 10, noBrain=False, env=env)
+    env.addObjects(agent)
+
+    assert len(agent.brain.genome_to_json()) == 2

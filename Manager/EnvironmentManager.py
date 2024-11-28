@@ -6,6 +6,7 @@ from Objects.Agent import Agent
 from Manager.CognitiveManager import Brain
 from Objects.Food import Food
 from Manager.IDManager import GenomeManagerInstance
+from Manager.BiomeManager import BiomeManager
 import neat
 config_path = "config-feedforward"
 NEATConfig = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation,
@@ -14,7 +15,7 @@ NEATConfig = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.Defa
 class Enviroment():
     next_node_id = 0
 
-    def __init__(self, width = 100, height = 100, agentsCount= 0, foodCount = 0, minCountAgent=-1, minCountFood=-1):
+    def __init__(self, width = 100, height = 100, agentsCount= 0, foodCount = 0, minCountAgent=-1, minCountFood=-1, numOfBiomes=2):
         self.objects = []
         self.logger = logging.getLogger(__name__)
 
@@ -30,6 +31,9 @@ class Enviroment():
 
         self.minCountAgent = minCountAgent
         self.minCountFood = minCountFood
+
+        self.biomeManager = BiomeManager(self.width, self.height, numOfBiomes)
+        self.logger.debug("BiomeManager created")
 
         self.spawnObjects(Agent, agentsCount, rad=rect(0, 0, self.width, self.height), fooodlevel=100, maxfoodlevel=100)
         self.spawnObjects(Food, foodCount, rad=rect(0, 0, self.width, self.height), foodlevel=10)
