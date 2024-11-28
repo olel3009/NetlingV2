@@ -27,7 +27,9 @@ class BiomeManager:
         """
         Determines an appropriate scale factor for the biome map based on its width.
         """
-        if width <= 100:
+        return 1
+        #TODO Fix
+        if width <= 500:
             return 1
         for factor in range(10, 0, -1):
             if width % factor == 0:
@@ -43,7 +45,7 @@ class BiomeManager:
 
         for i in range(width):
             for j in range(height):
-                value = noise([i / 75, j / 75])  # Scale improves distribution
+                value = noise([i / 500, j / 500])  # Scale improves distribution
                 biome_map[i, j] = int((value + 1) / 2 * numBiomes) % numBiomes
 
         return biome_map

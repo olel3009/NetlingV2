@@ -25,6 +25,11 @@ class Object:
     def onCollission(self, obj, eventManager):
         pass
 
+    def validMove(self, x, y):
+        if x < 0 or x > self.env.width or y < 0 or y > self.env.height:
+            return False
+        return True
+
     def teleport(self, x, y, r = None):
         self.x = x
         self.y = y
@@ -46,9 +51,10 @@ class Object:
         dy = distance * math.sin(angle)
         if not self.validMove(self.x + dx, self.y + dy):
             self.logger.debug(f"{self.type} can't move to ({self.x + dx}, {self.y + dy})")
-            return
+            return False
         self.moveRelative(dx, dy)
         self.logger.debug(f"{self.type} moved to ({self.x}, {self.y})")
+        return True
 
     def onDeath(self, obj, eventManager):
         pass

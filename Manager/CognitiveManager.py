@@ -1,11 +1,9 @@
 import neat
 import random
 import logging
-# Lade NEAT-Konfiguration aus der Config-Datei
-from Manager.IDManager import GenomeManagerInstance
-
+import os
 class Brain:
-    def __init__(self, repeatOfMutation=10):
+    def __init__(self, repeatOfMutation=100):
         self.logger = logging.getLogger(__name__)
         # Erstelle ein neues Genom mit einer zufälligen ID
         genome_id = GenomeManagerInstance.generateID()
@@ -21,6 +19,7 @@ class Brain:
         self.net = neat.nn.FeedForwardNetwork.create(self.genome, GenomeManagerInstance.NEATConfig)
         for _ in range(repeatOfMutation):
             self._apply_mutation(self.genome.mutate_add_connection)
+
 
     def think(self, inputs, lens=None):
         """
@@ -39,8 +38,8 @@ class Brain:
         """
         Wandelt ein Objekt in einen Vektor um, der die Distanz, den Winkel und den Typ des Objekts enthält.
         """
-        distance = obj[0]
-        angle = obj[1]
+        distance = (30 / obj[0]) if obj[0] != 0 else 0
+        angle = (360 / obj[1]) if obj[1] != 0 else 0
         object = obj[2]
         type = object.identifier
         return [distance, angle, type]
@@ -73,6 +72,32 @@ class Brain:
 
         # Netzwerk nach Mutation aktualisieren
         self.net = neat.nn.FeedForwardNetwork.create(self.genome, GenomeManagerInstance.NEATConfig)
+
+    def check_output_connections(self):
+        """
+        Überprüft, ob jedes Output-Neuron im NEAT-Netzwerk mindestens einmal aktiviert werden kann.
+        Testet das Netzwerk mit zufälligen Eingaben und prüft, ob alle Outputs nicht immer Null sind.
+        """
+        max_tests = 10  # Anzahl der zufälligen Tests
+
+        for test in range(max_tests):
+            # Generiere zufällige Eingaben für das Netzwerk
+            random_inputs = [random.random() for _ in range(len(self.net.input_nodes))]
+
+            # Aktiviere das Netzwerk
+            think = self.net.activate(random_inputs)
+
+            # Protokollierung für Debugging-Zwecke
+            self.logger.debug(f"Test {test + 1}/{max_tests}: Outputs: {think}")
+
+            # Wenn alle Outputs 0 sind, ist das Netzwerk nicht vollständig verbunden
+            if all(output == 0 for output in think):
+                self.logger.warning(f"Test {test + 1}: Outputs sind alle 0. Netzwerk ist nicht vollständig verbunden.")
+                return False
+
+        # Alle Tests bestanden
+        self.logger.info("Alle Outputs konnten mindestens einmal aktiviert werden.")
+        return True
 
     def _apply_mutation(self, mutation):
         # Prüfe, ob die Mutation `genome_config` erwartet
@@ -109,3 +134,34 @@ class Brain:
             "nodes": nodes,
             "connections": connections
         }
+
+class GenomeManager:
+    id = 0
+    logger = logging.getLogger(__name__)
+
+    def __init__(self):
+        config_path = "config-feedforward"  # Stelle sicher, dass der Pfad korrekt ist
+        if not os.path.exists(config_path):
+            raise FileNotFoundError(f"Config-Datei nicht gefunden: {config_path}")
+
+        # Lade die Konfiguration
+        self.NEATConfig = neat.Config(
+            neat.DefaultGenome,
+            neat.DefaultReproduction,
+            neat.DefaultSpeciesSet,
+            neat.DefaultStagnation,
+            config_path,
+        )
+
+        # Debugging-Ausgabe
+        print(f"Config geladen: num_outputs = {self.NEATConfig.genome_config.num_outputs}")
+        print(f"Output Keys: {getattr(self.NEATConfig.genome_config, 'output_keys', 'FEHLT')}")
+
+        # Überprüfe auf fehlende output_keys
+        if not hasattr(self.NEATConfig.genome_config, "output_keys"):
+            raise ValueError("output_keys wurde nicht generiert. Überprüfe die Config-Datei und Initialisierung.")
+    def generateID(self):
+        GenomeManager.id += 1
+        GenomeManager.logger.debug(f"ID generated: {GenomeManager.id}")
+        return GenomeManager.id
+GenomeManagerInstance = GenomeManager()

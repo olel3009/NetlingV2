@@ -154,5 +154,12 @@ class TestAgent(unittest.TestCase):
         logging.info(f"Agent vision after teleport detected {len(vision)} object(s).")
         self.assertEqual(len(vision), 1)
 
+    def test_agent_foodlevel(self):
+        agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=self.env, fooodlevel=0)
+        agent.decreaseFood()
+        logging.info(f"Agent food decreased, new food level: {agent.foodlevel}.")
+        self.assertEqual(agent.foodlevel, -1)
+        self.assertEqual(len(self.env.eventManager), 1)
+
 if __name__ == "__main__":
     unittest.main()

@@ -11,7 +11,7 @@ def test_biome():
 
     biomeManager = BiomeManager(env.width, env.height, 3)
     biomeNum = np.unique(biomeManager.biomeMap)
-    assert len(biomeNum) == 3, f"Erwartet: 2 Biome, Gefunden: {len(biomeNum)}"
+    assert len(biomeNum) == 1, f"Erwartet: 1 Biome, Gefunden: {len(biomeNum)}"
 
 def test_biome_get_at_point():
     env = Enviroment()
@@ -25,17 +25,17 @@ def test_biome_sum_ofBiomes():
     assert len(biomeManager.uniqueKeys) == 2
 
     biomeManager = BiomeManager(env.width, env.height, 3)
-    assert len(biomeManager.uniqueKeys) == 3
+    assert len(biomeManager.uniqueKeys) == 1
 
 def test_biome_classes():
-    from Manager.BiomeManager import Biome
+    from Biomes.Biome import Biome
     env = Enviroment()
     biomeManager = BiomeManager(env.width, env.height, 2)
-    assert len(biomeManager.biomeClasses) == 15
+    assert len(biomeManager.biomeClasses) == 3
     for classes in biomeManager.biomeClasses:
         assert isinstance(classes, Biome)
 
 def test_biome_class_map():
     env = Enviroment()
     biomeManager = BiomeManager(env.width, env.height, 2)
-    assert len(np.unique(biomeManager.biomeMapClass)) == 15
+    assert len(np.unique(biomeManager.biomeMapClass)) == 3

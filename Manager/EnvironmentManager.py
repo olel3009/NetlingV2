@@ -3,9 +3,8 @@ from Manager.QuadTreeManager import Quadtree, rect
 from Manager.EventManager import Events, CollissionEvent
 import random
 from Objects.Agent import Agent
-from Manager.CognitiveManager import Brain
+from Manager.CognitiveManager import Brain, GenomeManagerInstance
 from Objects.Food import Food
-from Manager.IDManager import GenomeManagerInstance
 from Manager.BiomeManager import BiomeManager
 import neat
 config_path = "config-feedforward"
@@ -77,8 +76,12 @@ class Enviroment():
         if self.minCountAgent != -1 and len([obj for obj in self.objects if isinstance(obj, Agent)]) < self.minCountAgent:
             agent_params = (250, 250, 0, 10, 10, 50, 100)
             agents = [obj for obj in self.objects if isinstance(obj, Agent)]
-            parent1 = max(agents, key=lambda agent: agent.foodlevel)
-            parent2 = max([agent for agent in agents if agent != parent1], key=lambda agent: agent.foodlevel)
+            try:
+                parent1 = max(agents, key=lambda agent: agent.foodlevel)
+                parent2 = max([agent for agent in agents if agent != parent1], key=lambda agent: agent.foodlevel)
+            except:
+                parent1 = Agent(*agent_params, env=self)
+                parent2 = Agent(*agent_params, env=self)
             self.addObjects(self.create_offspring_from_parents(parent1, parent2, NEATConfig, self, agent_params))
         if self.minCountFood != -1 and len([obj for obj in self.objects if isinstance(obj, Food)]) < self.minCountFood:
             self.spawnObjects(Food, 1, rad=rect(0, 0, self.width, self.height), foodlevel=10)
@@ -134,8 +137,6 @@ class Enviroment():
         y = random.randint(0, self.height)
 
         # Debug-Ausgabe für die Eltern
-        print(
-            f"Erzeuge Nachkomme aus Eltern:\n- Parent1 Fitness: {parent1.foodlevel}\n- Parent2 Fitness: {parent2.foodlevel}")
         if parent1.foodlevel < 50 or parent2.foodlevel < 50:
             a = Agent(x, y, r, width, height, foodlevel, maxfoodlevel, env=env)
             a.brain.mutate_randomly(10)
@@ -160,5 +161,4 @@ class Enviroment():
         brain.net = neat.nn.FeedForwardNetwork.create(child_genome, GenomeManagerInstance.NEATConfig)
         new_agent = Agent(x, y, r, width, height, foodlevel, maxfoodlevel, noBrain=False, env=env)
         new_agent.brain = brain
-        print(f"Neuer Agent erstellt mit ID: {child_genome.key} und Gehirn-Netzwerk.")
         return new_agent

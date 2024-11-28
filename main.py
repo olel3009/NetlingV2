@@ -12,10 +12,10 @@ from Manager.NetworkManager import ConnectionManager
 logging.basicConfig(level=logging.INFO)
 
 manager = ConnectionManager()
-environment = Enviroment(1000, 1000, minCountAgent=80, minCountFood=200)
+environment = Enviroment(500, 500, minCountAgent=20, minCountFood=80)
 
-environment.spawnObjects(Food, 400, foodlevel=20)
-environment.spawnObjects(Agent, 100)
+environment.spawnObjects(Food, 40, foodlevel=20)
+environment.spawnObjects(Agent, 5)
 
 app = FastAPI()
 app.add_middleware(
@@ -53,7 +53,9 @@ async def getENVSettings():
 
 @app.get("/getBiome")
 async def getBiome():
-    return environment.biomeManager.biomeClasses
+    biome_map = environment.biomeManager.biomeMapClass.tolist()  # Convert to list # Convert to dict
+    return {"map": biome_map, "classes": [{"id": b.id, "name": b.name} for b in environment.biomeManager.biomeClasses]}
+
 @app.on_event("startup")
 async def startup_event():
     asyncio.create_task(update_environment())

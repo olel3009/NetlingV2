@@ -16,23 +16,41 @@ class Agent(Object):
         self.maxfoodlevel = maxfoodlevel
         self.noBrain = noBrain
         self.identifier = 0.9
+        self.foodDecrease = 0.1
         if not noBrain:
             self.brain = Brain()
-
-    def validMove(self, x, y):
-        if x < 0 or x > self.env.width or y < 0 or y > self.env.height:
-            return False
-        return True
+        self.distance = {"step": 0, "distance": 0}
 
     def update(self):
         if self.noBrain:
             return
-        r = self.brain.think([self.x, self.y], self.getVission())
-        self.r = r[0] * 360
-        self.moveRelativeByAngle(self.r, self.speed * r[1])
-        self.decreaseFood(0.2)
+        # Get the vision of the agent
+        x_ratio = 0 if self.x == 0 else self.env.width / self.x
+        y_ratio = 0 if self.y == 0 else self.env.height / self.y
+        eyes = self.getVission()
+        output = self.brain.think([x_ratio, y_ratio, 0 if self.r == 0 else self.r], eyes)
+
+        # Move the agent
+        self.r = output[0] * 360
+        isValid = self.moveRelativeByAngle(self.r, self.speed * output[1])
+
+        #Test if the agent is Alive
+        self.distance = {"step": self.distance["step"] + 1, "distance": 0 if not isValid else self.distance["distance"] + (output[1]*self.speed)}
+
+        #Kill the agent if it is not moving
+        if self.distance["step"] > 10 and self.distance["distance"] < 2:
+            self.foodlevel = 0  #TODO: Change this to a more elegant solution
+            self.logger.debug(f"{self.type} died")
+
+        # Calculate the FoodDecrease value
+        self.foodDecrease = self.calculateDecreaseValue()
+
+        # Decrease food level
+        self.decreaseFood(self.foodDecrease)
         pass
 
+    def calculateDecreaseValue(self):
+        return 0.1 + (self.distance["distance"] / 100)
     def decreaseFood(self, decreaseFaktor=1):
         self.foodlevel -= decreaseFaktor
         if self.foodlevel <= 0:
@@ -85,6 +103,9 @@ class Agent(Object):
 
         # Remove None values and limit to at most 3 results
         return [v for v in filtered_vission if v is not None][:3]
+
+    def getBiomeUnder(self):
+        return self.env.getBiome(self.x, self.y)
 
     def collect(self):
         return {"x": self.x, "y": self.y, "r": self.r, "width": self.width, "height": self.height, "id": self.id, "type": self.type, "foodlevel": self.foodlevel}
