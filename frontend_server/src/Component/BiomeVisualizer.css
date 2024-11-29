@@ -1,0 +1,26 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.biome-grid {
+    margin: 0 auto;
+    width: auto;
+    border: 2px solid #ddd; /* Optional: Rahmen um das gesamte Grid */
+}
+
+.biome-cell {
+    aspect-ratio: 1; /* Zellen bleiben quadratisch */
+    width: 100%; /* Füllt die Spaltenbreite */
+}
+
