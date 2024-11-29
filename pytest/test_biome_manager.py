@@ -3,39 +3,39 @@ from Manager.EnvironmentManager import Enviroment
 import numpy as np
 
 
-def test_biome():
+def testBiome():
     env = Enviroment()
     biomeManager = BiomeManager(env.width, env.height, 2)
-    biomeNum = np.unique(biomeManager.biomeMap)
+    biomeNum = np.unique(biomeManager.biomeTypeMap)
     assert len(biomeNum) == 2, f"Erwartet: 2 Biome, Gefunden: {len(biomeNum)}"
 
     biomeManager = BiomeManager(env.width, env.height, 3)
-    biomeNum = np.unique(biomeManager.biomeMap)
+    biomeNum = np.unique(biomeManager.biomeTypeMap)
     assert len(biomeNum) == 1, f"Erwartet: 1 Biome, Gefunden: {len(biomeNum)}"
 
-def test_biome_get_at_point():
+def testBiomeGetAtPoint():
     env = Enviroment()
     biomeManager = BiomeManager(env.width, env.height, 2)
-    assert biomeManager.getBiomeAt(0, 0) == biomeManager.biomeMap[0, 0]
-    assert biomeManager.getBiomeAt(50, 50) == biomeManager.biomeMap[50, 50]
+    assert biomeManager.getBiomeTypeAt(0, 0) == biomeManager.biomeTypeMap[0, 0]
+    assert biomeManager.getBiomeTypeAt(50, 50) == biomeManager.biomeTypeMap[50, 50]
 
-def test_biome_sum_ofBiomes():
+def testBiomeSumOfBiomes():
     env = Enviroment()
     biomeManager = BiomeManager(env.width, env.height, 2)
-    assert len(biomeManager.uniqueKeys) == 2
+    assert len(biomeManager.uniqueBiomeTypes) == 2
 
     biomeManager = BiomeManager(env.width, env.height, 3)
-    assert len(biomeManager.uniqueKeys) == 1
+    assert len(biomeManager.uniqueBiomeTypes) == 1
 
-def test_biome_classes():
+def testBiomeClasses():
     from Biomes.Biome import Biome
     env = Enviroment()
     biomeManager = BiomeManager(env.width, env.height, 2)
-    assert len(biomeManager.biomeClasses) == 3
-    for classes in biomeManager.biomeClasses:
+    assert len(biomeManager.biomeInstances) == 3
+    for classes in biomeManager.biomeInstances:
         assert isinstance(classes, Biome)
 
-def test_biome_class_map():
+def testBiomeClassMap():
     env = Enviroment()
     biomeManager = BiomeManager(env.width, env.height, 2)
-    assert len(np.unique(biomeManager.biomeMapClass)) == 3
+    assert len(np.unique(biomeManager.biomeInstanceMap)) == 3

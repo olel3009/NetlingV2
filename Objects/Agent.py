@@ -30,6 +30,11 @@ class Agent(Object):
         eyes = self.getVission()
         output = self.brain.think([x_ratio, y_ratio, 0 if self.r == 0 else self.r], eyes)
 
+        if output[3] > 0.8:
+            #Hit the nearest Player
+            self.logger.debug("Hit the nearest Player")
+            self.HitTheNearestPlayer(eyes)
+
         # Move the agent
         self.r = output[0] * 360
         isValid = self.moveRelativeByAngle(self.r, self.speed * output[1])
@@ -49,8 +54,22 @@ class Agent(Object):
         self.decreaseFood(self.foodDecrease)
         pass
 
+    def HitTheNearestPlayer(self, eyes):
+        if len(eyes) == 0: #TODO: Make them not have a Gun :=)
+            return False
+        nearest = None
+        for eye in eyes:
+            if eye[2].type == "Agent" and (nearest is None or eye[0] < nearest[0]) and eye[0] < 15:
+                nearest = eye
+        if nearest is not None:
+            nearest[2].foodlevel -= 50 #TODO: Add a Event for this
+            self.foodlevel += 50
+            print("Hit")
+            return True
+        return False
+
     def calculateDecreaseValue(self):
-        return 0.1 + (self.distance["distance"] / 100)
+        return 0.05 + (self.distance["distance"] / 100)
     def decreaseFood(self, decreaseFaktor=1):
         self.foodlevel -= decreaseFaktor
         if self.foodlevel <= 0:

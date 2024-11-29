@@ -161,5 +161,19 @@ class TestAgent(unittest.TestCase):
         self.assertEqual(agent.foodlevel, -1)
         self.assertEqual(len(self.env.eventManager), 1)
 
+    def test_agent_hit_nearest_player(self):
+        agent = Agent(0, 0, 0, 0, 0, noBrain=True, env=self.env)
+
+        logging.info("Agent hit nearest player test passed.")
+        self.assertEqual(agent.HitTheNearestPlayer([]), False)
+
+        agent1 = Agent(10, 0, 0, 0, 0, noBrain=True, env=self.env)
+        agent2 = Agent(20, 0, 0, 0, 0, noBrain=True, env=self.env)
+        self.env.addObjects(agent1)
+        self.env.addObjects(agent2)
+        logging.info("Added two agents to environment.")
+        self.assertEqual(agent.HitTheNearestPlayer([(10, 0, agent1), (20, 0, agent2)]), True)
+        self.assertEqual(agent1.foodlevel, 50)
+        self.assertEqual(agent2.foodlevel, 100)
 if __name__ == "__main__":
     unittest.main()

@@ -12,10 +12,10 @@ from Manager.NetworkManager import ConnectionManager
 logging.basicConfig(level=logging.INFO)
 
 manager = ConnectionManager()
-environment = Enviroment(500, 500, minCountAgent=20, minCountFood=80)
+environment = Enviroment(500, 500, minCountAgent=20, minCountFood=200)
 
-environment.spawnObjects(Food, 40, foodlevel=20)
-environment.spawnObjects(Agent, 5)
+environment.spawnObjectsInRect(Food, 40, foodlevel=20)
+environment.spawnObjectsInRect(Agent, 5)
 
 app = FastAPI()
 app.add_middleware(
@@ -26,15 +26,16 @@ app.add_middleware(
     allow_headers=["*"],  # Erlaubt alle Header
 )
 
-@app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
+@app.websocket("/ws/")
+async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            logging.info(f"Client {client_id} sent: {data}")
+            logging.info(f"Client sent: {data}")
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+        logging.info("Client disconnected.")
     except Exception as e:
         logging.error(f"Error: {e}")
         manager.disconnect(websocket)

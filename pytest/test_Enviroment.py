@@ -102,5 +102,17 @@ class TestEnvironmentManager(unittest.TestCase):
 
     def test_spawn(self):
         """Test, ob Objekte korrekt gespawnt werden."""
-        self.env.spawnObjects(Object, 10)
+        self.env.spawnObjectsInRect(Object, 10)
         self.assertEqual(len(self.env.objects), 10, "Spawned objects count does not match.")
+
+    def test_spawn_in_biome(self):
+        """Test, ob Objekte korrekt in Bestimmten Biomen gespawnt werden."""
+        from Biomes.Tundra import Tundra
+        instance = self.env.biomeManager.biomeInstances[0]
+        biome_class = type(instance)
+        self.assertIn(biome_class, self.env.biomeManager.biomeClassesMapping.values(), "Biome class not found in biome classes.")
+        self.env.spawnObjectsInBiome(Food, biome_class, 10, 10, 10, foodlevel=10)
+
+        for obj in self.env.objects:
+            self.assertIn(self.env.biomeManager.getBiomeTypeAt(obj.x, obj.y), self.env.biomeManager.biomeClassesMapping, "Object not spawned in correct biome.")
+

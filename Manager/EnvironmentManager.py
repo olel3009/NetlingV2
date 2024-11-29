@@ -34,25 +34,29 @@ class Enviroment():
         self.biomeManager = BiomeManager(self.width, self.height, numOfBiomes)
         self.logger.debug("BiomeManager created")
 
-        self.spawnObjects(Agent, agentsCount, rad=rect(0, 0, self.width, self.height), fooodlevel=100, maxfoodlevel=100)
-        self.spawnObjects(Food, foodCount, rad=rect(0, 0, self.width, self.height), foodlevel=10)
+        self.spawnObjectsInRect(Agent, agentsCount, rad=rect(0, 0, self.width, self.height), fooodlevel=100, maxfoodlevel=100)
+        self.spawnObjectsInRect(Food, foodCount, rad=rect(0, 0, self.width, self.height), foodlevel=10)
 
     def addObjects(self, obj):
         self.objects.append(obj)
         self.quadtree.insert(obj)
         self.logger.debug(f"Object added at ({obj.x}, {obj.y})")
 
-    def spawnObjects(self, instance, count = 1, width=10, height=10, rad=None, **kwargs):
-        for i in range(count):
-            if rad is None:
-                x = random.randint(0, self.width)
-                y = random.randint(0, self.height)
-            else:
-                x = random.randint(rad.x, rad.width + rad.x)
-                y = random.randint(rad.y, rad.height + rad.y)
-            obj = instance(x, y, 0,width, height, env=self, **kwargs)
-            if isinstance(obj, Agent):
-                obj.brain.mutate_randomly(10)
+    def spawnObjectsInRect(self, instance, count=1, width=10, height=10, rad=None, **kwargs):
+        for _ in range(count):
+            x = random.randint(rad.x if rad else 0, (rad.width + rad.x) if rad else self.width)
+            y = random.randint(rad.y if rad else 0, (rad.height + rad.y) if rad else self.height)
+            obj = instance(x, y, 0, width, height, env=self, **kwargs)
+            self.addObjects(obj)
+            self.logger.debug(f"Object spawned at ({obj.x}, {obj.y})")
+
+    def spawnObjectsInBiome(self, instance, biome, count=1, width=10, height=10, **kwargs):
+        for _ in range(count):
+            cluster = [coord for cls in self.biomeManager.biomeInstances if isinstance(cls, biome) for coord in cls.cluster]
+            rCluster = random.choice(cluster)
+            x = rCluster[0]
+            y = rCluster[1]
+            obj = instance(x, y, 0, width, height, env=self, **kwargs)
             self.addObjects(obj)
             self.logger.debug(f"Object spawned at ({obj.x}, {obj.y})")
 
@@ -84,7 +88,7 @@ class Enviroment():
                 parent2 = Agent(*agent_params, env=self)
             self.addObjects(self.create_offspring_from_parents(parent1, parent2, NEATConfig, self, agent_params))
         if self.minCountFood != -1 and len([obj for obj in self.objects if isinstance(obj, Food)]) < self.minCountFood:
-            self.spawnObjects(Food, 1, rad=rect(0, 0, self.width, self.height), foodlevel=10)
+            self.spawnObjectsInRect(Food, 1, rad=rect(0, 0, self.width, self.height), foodlevel=10)
 
     def collectAll(self):
         return [obj.collect() for obj in self.objects]
