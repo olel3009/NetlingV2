@@ -54,8 +54,8 @@ async def getENVSettings():
 
 @app.get("/getBiome")
 async def getBiome():
-    biome_map = environment.biomeManager.biomeMapClass.tolist()  # Convert to list # Convert to dict
-    return {"map": biome_map, "classes": [{"id": b.id, "name": b.name} for b in environment.biomeManager.biomeClasses]}
+    biomeMap = environment.biomeManager.biomeInstanceMap.tolist()  # Convert to list of key-value pairs
+    return {"map": biomeMap, "classes": [{"id": b.id, "name": b.__class__.__name__} for b in environment.biomeManager.biomeInstances]}
 
 @app.on_event("startup")
 async def startup_event():

@@ -16,7 +16,7 @@ class Agent(Object):
         self.maxfoodlevel = maxfoodlevel
         self.noBrain = noBrain
         self.identifier = 0.9
-        self.foodDecrease = 0.1
+        self.foodDecrease = 0.05
         if not noBrain:
             self.brain = Brain()
         self.distance = {"step": 0, "distance": 0}
